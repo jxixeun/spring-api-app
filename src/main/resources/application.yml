@@ -38,3 +38,16 @@ feign:
       default:
         connectTimeout: 5000
         readTimeout: 5000
+
+kakao:
+  client:
+    id: ENC(btQ/x1AZocqDg74t2ite420Mq7mpPxzO8eZNoTu0o3TIcUqdmwksUarjKejpJ3fC)
+    secret: ENC(zdsNo5GzXAUWECcBnNC6t5SrOtDS+XgAd2DgVXfjzJ61DZxZzF8uzeJf09fYF/os)
+
+token:
+  secret: ENC(IX+47K2nTXxq0yNKL6bu9G/eSfKIEppPwDK/5kuG3C0=) # 임의의 문자열
+  access-token-expiration-time: 900000  # 15분 1000(ms) x 60(s) x 15(m)
+  refresh-token-expiration-time: 1209600000 # 2주 1000(ms) x 60 (s) x 60(m) x 24(h) x 14(d)
+
+jasypt:
+  password: ${PASSWORD}
