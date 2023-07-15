@@ -3,9 +3,15 @@ package com.app.global.config.web;
 import com.app.global.intercepter.AdminAuthorizationIntecepter;
 import com.app.global.intercepter.AuthenticationIntercepter;
 import com.app.global.resolver.memberinfo.MemberInfoArgumentResolver;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.navercorp.lucy.security.xss.servletfilter.XssEscapeServletFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -19,6 +25,7 @@ public class WebConfig implements WebMvcConfigurer {
     private final AuthenticationIntercepter authenticationIntercepter;
     private final MemberInfoArgumentResolver memberInfoArgumentResolver;
     private final AdminAuthorizationIntecepter adminAuthorizationIntecepter;
+    private final ObjectMapper objectMapper;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -53,5 +60,26 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(memberInfoArgumentResolver);
+    }
+
+    @Bean
+    public FilterRegistrationBean<XssEscapeServletFilter> filterRegistrationBean() {
+        FilterRegistrationBean<XssEscapeServletFilter> filterRegistration = new FilterRegistrationBean<>();
+        filterRegistration.setFilter(new XssEscapeServletFilter());
+        filterRegistration.setOrder(1);
+        filterRegistration.addUrlPatterns("/*");
+        return filterRegistration;
+    }
+
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        converters.add(jsonEscapeConverter());
+    }
+
+    @Bean
+    public MappingJackson2HttpMessageConverter jsonEscapeConverter() {
+        ObjectMapper copy = objectMapper.copy();
+        copy.getFactory().setCharacterEscapes(new HtmlCharacterEscapes());
+        return new MappingJackson2HttpMessageConverter(copy);
     }
 }
